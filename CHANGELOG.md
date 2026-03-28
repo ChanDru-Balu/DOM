@@ -1,27 +1,27 @@
-##Changelog
+## Changelog
 
 
-##[1.0.1] - 29/03/2026
+## [1.0.1] - 29/03/2026
 
-###Added
+### Added
 - Create the changelog
 -Included the changes
 
-###Fixed
+### Fixed
 -Nothign
 
-###Changed
+### Changed
 -Nothing
 
 
-##[1.0.0] - 28/03/2026
+## [1.0.0] - 28/03/2026
 
-###Added 
+### Added 
 - Init the repo
 - create the README.md
 
-###Fixed
+### Fixed
 -Nothing
 
-###Changed
+### Changed
 -Nothing
