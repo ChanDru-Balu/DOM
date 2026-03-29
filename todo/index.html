@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title> TODO APP - BASIC DOM </title>
+</head>
+
+<body>
+    <div id="root"></div>
+    <script>
+
+        const state = {
+            todos: [],
+            editTodoId: null
+        }
+
+        const root = document.getElementById('root');
+
+        function createDom(virtualNode) {
+
+            // Base case
+            if (typeof virtualNode === 'string') {
+                return document.createTextNode(virtualNode)
+            }
+
+            // Create Element
+            const el = document.createElement(virtualNode.type);
+
+            // Add Props
+            for (let key in virtualNode.props) {
+                if (key.startsWith('on')) {
+                    el.addEventListener(
+                        key.slice(2),
+                        virtualNode.props[key]
+                    )
+                } else {
+                    el.setAttribute(key, virtualNode.props[key])
+                }
+            }
+
+            // console.log({ virtualNode });
+            // Recursive case
+            for (let child of virtualNode.children) {
+                el.append(createDom(child))
+            }
+
+            return el
+
+        }
+
+
+
+        function eventsPush() {
+
+            root.addEventListener('click', function (e) {
+                // console.log('Button clicked in the ', e);
+
+                if (e.target.classList.contains('complete-todo-button')) {
+                    const key = e.target.getAttribute('key');
+                    console.log({ key });
+                    state.todos.find(todo => todo.id === key).completed = true;
+                    rerun()
+                }
+
+                if (e.target.classList.contains('edit-todo-button')) {
+                    const key = e.target.getAttribute('key');
+                    console.log({ key });
+                    state.editTodoId = key;
+                    console.log({ state })
+                    rerun()
+                }
+
+                if (e.target.classList.contains('delete-todo-button')) {
+                    const key = e.target.getAttribute('key');
+                    console.log({ key });
+                    state.todos = state.todos.filter(todo => todo.id !== key)
+                    rerun()
+                }
+
+
+
+            })
+        }
+
+        function addTodo(e) {
+            const title = document.getElementById('todoTitle');
+            console.log({ title });
+
+            if (state.editTodoId) {
+                state.todos.find(todo => todo.id === state.editTodoId).title = title.value;
+                state.editTodoId = null;
+            } else {
+                state.todos.unshift({
+                    id: crypto.randomUUID(),
+                    title: title.value,
+                    createdAt: new Date().getTime(),
+                    completed: false
+                })
+            }
+
+            title.value = '';
+
+            console.log({ state })
+            rerun()
+        }
+
+        function App() {
+            return (
+                {
+                    type: 'div',
+                    props: {
+                        style: `
+                                display: flex;
+                                justify-content: center;
+                                align-items: center;
+                                flex-direction: column;
+                            `
+                    },
+                    children: [
+                        {
+                            type: 'h1',
+                            props: {
+                                style: `
+                                        text-align:center;
+                                    `
+                            },
+                            children: ['TODO APP - Simple base DOM']
+                        },
+                        {
+                            type: 'div',
+                            props: {
+                                style: `
+                                    display: flex;
+                                    align-items:center;
+                                    justify-content: center;
+                                    `
+                            },
+                            children: [
+                                {
+                                    type: 'p',
+                                    props: {
+
+                                    },
+                                    children: ['Todo Title:']
+                                },
+                                {
+                                    type: 'input',
+                                    props: {
+                                        id: 'todoTitle',
+                                        placeholder: 'Enter todo tile',
+                                        value: `${state.editTodoId ? state.todos.find(todo => todo.id === state.editTodoId).title : ''}`
+                                    },
+                                    children: []
+                                },
+                                {
+                                    type: 'button',
+                                    props: {
+                                        onclick: addTodo
+                                    },
+                                    children: [`${state.editTodoId ? 'Update Todo' : 'Add todo'}`]
+                                }
+                            ]
+                        },
+                        {
+                            type: 'ul',
+                            props: {},
+                            children:
+                                state.todos.map(todo => {
+                                    return ({
+                                        type: 'li',
+                                        props: {
+                                            style:
+                                                `
+                                                width: 400px;
+                                            `
+                                        },
+                                        children: [
+                                            {
+                                                type: 'div',
+                                                props: {
+                                                    style: `
+                                                        display: flex;
+                                                        justify-content: space-between;
+                                                        align-items: center;
+                                                    `
+                                                },
+                                                children: [
+                                                    {
+                                                        type: 'p',
+                                                        props: {
+                                                            class: 'todo-title',
+                                                            style: `
+                                                                text-decoration: ${todo.completed ? 'line-through' : ''} ;
+                                                            `
+                                                        },
+                                                        children: [todo.title]
+                                                    },
+                                                    {
+                                                        type: 'div',
+                                                        props: {
+                                                            class: 'buttons-area',
+                                                            style: `
+                                                                display: flex;
+                                                                gap: 10px;
+                                                            `
+                                                        },
+                                                        children: [
+                                                            {
+                                                                type: 'button',
+                                                                props: {
+                                                                    key: todo.id,
+                                                                    class: 'complete-todo-button',
+                                                                    // onclick: clickTodo
+                                                                },
+                                                                children: ['Complete']
+                                                            },
+                                                            {
+                                                                type: 'button',
+                                                                props: {
+                                                                    key: todo.id,
+                                                                    class: 'edit-todo-button',
+                                                                    // onclick: clickTodo
+                                                                },
+                                                                children: ['Edit']
+                                                            },
+                                                            {
+                                                                type: 'button',
+                                                                props: {
+                                                                    key: todo.id,
+                                                                    class: 'delete-todo-button',
+                                                                    // onclick: clickTodo
+                                                                },
+                                                                children: ['Delete']
+                                                            },
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    })
+                                })
+
+                        }
+                    ]
+                }
+            )
+        }
+
+
+        function rerun() {
+            renderApp()
+        }
+
+
+        function renderApp() {
+            root.innerHTML = ``;
+            root.appendChild(createDom(App()));
+            // console.log(root);
+        }
+
+        renderApp();
+
+        eventsPush();
+
+
+    </script>
+</body>
+
+</html>

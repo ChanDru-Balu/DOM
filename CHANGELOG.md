@@ -1,5 +1,12 @@
 ## Changelog
 
+## [1.1.0] - 30/03/20206
+
+### DOM basic
+
+- Basic dom properties
+- using state
+- using render from App() function
 
 ## [1.0.1] - 29/03/2026
 
