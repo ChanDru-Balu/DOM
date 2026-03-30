@@ -10,11 +10,15 @@
     <script>
 
         const state = {
-            todos: [],
+            todos: JSON.parse(localStorage.getItem('todos')) || [],
             editTodoId: null
         }
 
         const root = document.getElementById('root');
+
+        function persist(){
+            localStorage.setItem('todos',JSON.stringify(state.todos));
+        }
 
         function createDom(virtualNode) {
 
@@ -248,6 +252,7 @@
 
 
         function rerun() {
+            persist()
             renderApp()
         }
 

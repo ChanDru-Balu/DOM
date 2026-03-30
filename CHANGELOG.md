@@ -1,5 +1,9 @@
 ## Changelog
 
+## [1.1.1] - 30/03/2026
+
+-Localstorage options enabled
+
 ## [1.1.0] - 30/03/20206
 
 ### DOM basic

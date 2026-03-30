@@ -9,4 +9,8 @@ Document Object Model to Simple framework for multiple projects
 - Basic dom properties
 - using state
 - using render from App() function
+- Add localstorage for data persist
+
+
+
 
