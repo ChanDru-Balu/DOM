@@ -8,7 +8,8 @@
 <body>
     <div id="root"></div>
     <script>
-
+        let oldVirtualNode = null ;
+        
         const state = {
             todos: JSON.parse(localStorage.getItem('todos')) || [],
             editTodoId: null
@@ -53,6 +54,54 @@
         }
 
 
+        function updateDom(parentElement , newVirtualNode , oldVirtualNode , index = 0){
+
+            /** STEP1 - Initialise the current Element */
+            const currentElement = parentElement.childNodes[index];
+
+
+            /** STEP2 - Create new node if there is no existing old node */
+            if(!oldVirtualNode){
+                parentElement.appendChild(createDom(newVirtualNode));
+                return
+            }
+
+            /** STEP3 - Remove old node if there is no new virtual node */
+            if(!newVirtualNode){
+                parentElement.removeChild(currentElement);
+                return
+            }
+
+            /** STEP4 - check and replace the text nodes */
+            if((typeof newVirtualNode.children !== typeof oldVirtualNode.children) 
+                || (typeof newVirtualNode === 'string' && newVirtualNode !== oldVirtualNode )
+                || (newVirtualNode.type !== oldVirtualNode.type)){
+
+                    parentElement.replaceChild(createDom(newVirtualNode) , currentElement);
+                    return
+            }
+
+            /** STEP5 - Replace the props , and this will need extra function will do later */
+
+
+            /** STEP6 - Recusrive function for the all the children of the Main node */
+
+            if(newVirtualNode.type){
+                
+                const maxLength = Math.max( newVirtualNode.children.length , oldVirtualNode.children.length);
+
+                for(let i = 0; i< maxLength ; i++ ){
+                    console.log({currentElement})
+                    updateDom(currentElement , newVirtualNode.children[i] , oldVirtualNode.children[i] , i)
+
+                }
+
+            }
+
+            return currentElement
+
+
+        }
 
         function eventsPush() {
 
@@ -258,9 +307,17 @@
 
 
         function renderApp() {
-            root.innerHTML = ``;
-            root.appendChild(createDom(App()));
-            // console.log(root);
+            // root.innerHTML = ``;
+            const newVirtualNode = App();
+
+            if(!oldVirtualNode){
+                root.appendChild(createDom(newVirtualNode));
+            } else {
+                updateDom(root , newVirtualNode , oldVirtualNode )
+            }
+
+            oldVirtualNode = newVirtualNode;
+
         }
 
         renderApp();
