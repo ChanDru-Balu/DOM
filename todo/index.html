@@ -8,8 +8,8 @@
 <body>
     <div id="root"></div>
     <script>
-        let oldVirtualNode = null ;
-        
+        let oldVirtualNode = null;
+
         const state = {
             todos: JSON.parse(localStorage.getItem('todos')) || [],
             editTodoId: null
@@ -17,8 +17,8 @@
 
         const root = document.getElementById('root');
 
-        function persist(){
-            localStorage.setItem('todos',JSON.stringify(state.todos));
+        function persist() {
+            localStorage.setItem('todos', JSON.stringify(state.todos));
         }
 
         function createDom(virtualNode) {
@@ -54,45 +54,68 @@
         }
 
 
-        function updateDom(parentElement , newVirtualNode , oldVirtualNode , index = 0){
+        function replaceProps(currentElement,newProps, oldProps) {
+            // 1. Remove old props
+            for (let key in oldProps) {
+                if (!(key in newProps)) {
+                    if(key.startsWith('on')){
+                        currentElement.removeEventListener(key.slice(2) , oldProps[key])
+                    }
+                    currentElement.removeAttribute(key);
+                }
+            }
 
+            // 2. Add / update new props
+            for (let key in newProps) {
+                if (newProps[key] !== oldProps[key]) {
+                    if(key.startsWith('on')){
+                        if(oldProps[key]){
+                            currentElement.removeEventListener(key.slice(2),oldProps[key])
+                        }
+                        currentElement.addEventListener(key.slice(2),newProps[key]);
+                    }
+                    currentElement.setAttribute(key, newProps[key]);
+                }
+            }
+        }
+
+        function updateDom(parentElement, newVirtualNode, oldVirtualNode, index = 0) {
             /** STEP1 - Initialise the current Element */
             const currentElement = parentElement.childNodes[index];
 
 
             /** STEP2 - Create new node if there is no existing old node */
-            if(!oldVirtualNode){
+            if (!oldVirtualNode) {
                 parentElement.appendChild(createDom(newVirtualNode));
                 return
             }
 
             /** STEP3 - Remove old node if there is no new virtual node */
-            if(!newVirtualNode){
+            if (!newVirtualNode) {
                 parentElement.removeChild(currentElement);
                 return
             }
 
             /** STEP4 - check and replace the text nodes */
-            if((typeof newVirtualNode.children !== typeof oldVirtualNode.children) 
-                || (typeof newVirtualNode === 'string' && newVirtualNode !== oldVirtualNode )
-                || (newVirtualNode.type !== oldVirtualNode.type)){
+            if ((typeof newVirtualNode.children !== typeof oldVirtualNode.children)
+                || (typeof newVirtualNode === 'string' && newVirtualNode !== oldVirtualNode)
+                || (newVirtualNode.type !== oldVirtualNode.type)) {
 
-                    parentElement.replaceChild(createDom(newVirtualNode) , currentElement);
-                    return
+                parentElement.replaceChild(createDom(newVirtualNode), currentElement);
+                return
             }
 
             /** STEP5 - Replace the props , and this will need extra function will do later */
-
+            replaceProps(currentElement, newVirtualNode.props, oldVirtualNode.props)
 
             /** STEP6 - Recusrive function for the all the children of the Main node */
 
-            if(newVirtualNode.type){
-                
-                const maxLength = Math.max( newVirtualNode.children.length , oldVirtualNode.children.length);
+            if (newVirtualNode.type) {
 
-                for(let i = 0; i< maxLength ; i++ ){
-                    console.log({currentElement})
-                    updateDom(currentElement , newVirtualNode.children[i] , oldVirtualNode.children[i] , i)
+                const maxLength = Math.max(newVirtualNode.children.length, oldVirtualNode.children.length);
+
+                for (let i = 0; i < maxLength; i++) {
+                    updateDom(currentElement, newVirtualNode.children[i], oldVirtualNode.children[i], i)
 
                 }
 
@@ -200,8 +223,9 @@
                                     type: 'input',
                                     props: {
                                         id: 'todoTitle',
-                                        placeholder: 'Enter todo tile',
-                                        value: `${state.editTodoId ? state.todos.find(todo => todo.id === state.editTodoId).title : ''}`
+                                        class: `${state.editTodoId ? 'hell' : ''}`,
+                                        placeholder: `Enter todo title`,
+                                        value: `${state.editTodoId ? state.todos.find(todo=>todo.id === state.editTodoId).title : ''}`
                                     },
                                     children: []
                                 },
@@ -310,10 +334,10 @@
             // root.innerHTML = ``;
             const newVirtualNode = App();
 
-            if(!oldVirtualNode){
+            if (!oldVirtualNode) {
                 root.appendChild(createDom(newVirtualNode));
             } else {
-                updateDom(root , newVirtualNode , oldVirtualNode )
+                updateDom(root, newVirtualNode, oldVirtualNode)
             }
 
             oldVirtualNode = newVirtualNode;

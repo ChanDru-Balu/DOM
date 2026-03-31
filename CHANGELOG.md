@@ -1,5 +1,21 @@
 ## Changelog
 
+## [1.1.2] - 31/03/2026
+
+### Added
+
+- Update nodes
+- Remove / add / update props of the element
+
+### Fixed
+
+- Instead of rerender the whole dom we just update the dom with new nodes
+
+### Changed
+
+- Structure changed from rerender to replace nodes
+
+
 ## [1.1.1] - 30/03/2026
 
 -Localstorage options enabled
