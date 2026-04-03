@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title> Counter - DOM app </title>
+    </head>
+    <body>
+
+        <div id="root" ></div>
+
+        <script>
+            const root = document.getElementById('root');
+
+            const state = {
+                counter : 0
+            }
+
+            function setState(newState){
+                Object.assign(state,newState);
+                renderApp();
+            }
+
+            function increment(){
+                const  newState = {
+                    counter : ++state.counter
+                }
+                setState(newState)
+            }
+
+            function decrement(){
+                setState({counter : --state.counter})
+            }
+
+            function createDom(newVirtualNode){
+                console.log({newVirtualNode});
+
+                //STEP1 : Base case - return with created dom for the final child
+                if(typeof newVirtualNode === 'string'){
+                    return document.createTextNode(newVirtualNode)
+                }
+
+                // STEP2 : create a element which will hold the properties from node
+                const element = document.createElement(newVirtualNode.type);
+
+                //STEP3 : add props to the element
+                for(let key in newVirtualNode.props){
+                    if(key.startsWith('on')){
+                        element.addEventListener(key.slice(2).toLowerCase(),newVirtualNode.props[key])
+                    } else {
+                        element.setAttribute(key, newVirtualNode.props[key])
+                    }
+                }
+
+                // STEP 4 - final step for call the recusrsive pattern
+                for(let child of newVirtualNode.children || []){
+                    element.appendChild(createDom(child));
+                }
+
+                console.log('Element');
+                // STEP Final -5 - return the element to the root
+                return element
+
+
+            }
+
+
+            function eventsPush(){
+
+                root.addEventListener('click',function (e){
+
+                    if(e.target.classList.contains('increment-button')){
+                        console.log('Increment clicked:');
+                        let counterValue = document.getElementById('counterValue');
+                        console.log(counter , counterValue);
+                        ++counter;
+                        counterValue.textContent = counter;
+                    }
+
+                    if(e.target.classList.contains('decrement-button')){
+                         let counterValue = document.getElementById('counterValue');
+                        console.log(counter , counterValue);
+                        --counter;
+                        counterValue.textContent = counter;
+                    }
+
+                })
+
+            }
+            
+            function App(){
+                return ({
+                    type: 'div',
+                    props: {
+                        style: `display : flex ; gap: 10px; justify-content: center; align-items: center;`
+                    },
+                    children: [
+                        {
+                            type: 'button',
+                            props: {
+                                id: `decrementButton`,
+                                class : `decrement-button`,
+                                style : `background-color: red;`,
+                                onclick : decrement
+                            },
+                            children: ['-']
+                        },
+                        {
+                            type : 'p',
+                            props: { 
+                                id: 'counterValue',
+                                class: 'counter-value'
+                             },
+                             children: [state.counter.toString()]
+                        },
+                        {
+                            type: 'button',
+                            props: {
+                                id: 'incrementButton',
+                                class: 'increment-button',
+                                style: `background-color: green;`,
+                                onclick: increment
+                            },
+                            children: ['+']
+                        }
+                    ]
+                })
+            }
+
+            function renderApp(){
+                root.innerHTML = '';
+                root.appendChild(createDom(App()));
+            }
+
+            renderApp();
+
+            // eventsPush();
+
+        </script>
+
+    </body>
+</html>
