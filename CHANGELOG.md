@@ -1,5 +1,20 @@
 ## Changelog
 
+## [1.1.3] - 03/04/2026
+
+### Added
+
+- setState (useState hook equivelent)
+
+### Fixed
+
+- State added in application
+
+### Changed
+
+- Changing one variable into state value
+
+
 ## [1.1.2] - 31/03/2026
 
 ### Added
